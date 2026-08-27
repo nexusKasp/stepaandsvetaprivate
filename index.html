@@ -1,0 +1,1903 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Света хабалка 2006</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+
+/* =========================================================
+   BASE
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: #020204;
+}
+
+body {
+    color: white;
+
+    font-family:
+        Montserrat,
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+.background {
+    position: fixed;
+    inset: 0;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(90, 15, 100, .18),
+            transparent 38%
+        ),
+
+        radial-gradient(
+            circle at 10% 90%,
+            rgba(0, 90, 140, .12),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 90% 10%,
+            rgba(190, 0, 130, .10),
+            transparent 30%
+        ),
+
+        #020204;
+}
+
+
+/* =========================================================
+   GLOSS
+========================================================= */
+
+.gloss {
+    position: absolute;
+
+    width: 160%;
+    height: 30%;
+
+    left: -30%;
+    top: 30%;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent 35%,
+            rgba(255,255,255,.025) 45%,
+            rgba(255,255,255,.10) 50%,
+            rgba(255,255,255,.025) 55%,
+            transparent 65%
+        );
+
+    transform: rotate(-12deg);
+
+    animation:
+        glossMove 14s ease-in-out infinite alternate;
+
+    will-change: transform;
+}
+
+@keyframes glossMove {
+
+    from {
+        transform:
+            translate3d(-12%, 0, 0)
+            rotate(-12deg);
+    }
+
+    to {
+        transform:
+            translate3d(12%, 0, 0)
+            rotate(-12deg);
+    }
+}
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+canvas {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+#patterns {
+    z-index: 1;
+}
+
+#particles {
+    z-index: 2;
+}
+
+
+/* =========================================================
+   TITLE CONTAINER
+========================================================= */
+
+.title-container {
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 10;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    /*
+       Название будет уходить
+       вверх вместе с началом титров.
+    */
+
+    transition:
+        transform 2.8s cubic-bezier(.16, 1, .3, 1),
+        opacity 2.8s ease;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+
+/*
+   Уход названия.
+
+   Оно не исчезает резко,
+   а медленно улетает вверх.
+*/
+
+.title-container.leaving {
+
+    transform:
+        translate3d(0, -115vh, 0);
+
+    opacity: .08;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.title {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+
+    font-family:
+        "Great Vibes",
+        cursive;
+
+    font-size:
+        clamp(3rem, 9vw, 9rem);
+
+    color: white;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.85),
+        0 0 25px rgba(255,0,200,.55),
+        0 0 60px rgba(0,180,255,.25);
+
+    transform-style:
+        preserve-3d;
+
+    will-change:
+        transform;
+}
+
+
+/* =========================================================
+   LETTERS
+========================================================= */
+
+.letter {
+
+    display: inline-block;
+
+    opacity: 0;
+
+    transform:
+        translate3d(
+            var(--x),
+            var(--y),
+            0
+        )
+        rotate(var(--r))
+        scale(var(--s));
+
+    filter:
+        blur(10px);
+
+    transition:
+        transform 2.3s cubic-bezier(.16,1,.3,1),
+        opacity 1.25s ease,
+        filter 1.8s ease;
+
+    transition-delay:
+        var(--delay);
+
+    will-change:
+        transform,
+        opacity,
+        filter;
+}
+
+
+/*
+   Собранное состояние.
+*/
+
+.title.assembled .letter {
+
+    opacity: 1;
+
+    transform:
+        translate3d(0,0,0)
+        rotate(0deg)
+        scale(1);
+
+    filter:
+        blur(0);
+}
+
+
+/* =========================================================
+   TITLE FLOAT
+========================================================= */
+
+.title.assembled {
+
+    animation:
+        titleFloat 5s ease-in-out infinite;
+}
+
+@keyframes titleFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-5px);
+    }
+}
+
+
+/* =========================================================
+   RING
+========================================================= */
+
+.ring {
+
+    position: absolute;
+
+    width:
+        min(65vw, 750px);
+
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,0,200,.22);
+
+    box-shadow:
+        0 0 30px
+        rgba(255,0,200,.10),
+
+        inset 0 0 30px
+        rgba(0,180,255,.08);
+
+    animation:
+        ringRotate 18s linear infinite;
+
+    will-change:
+        transform;
+}
+
+.ring::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 10%;
+
+    border-radius: 50%;
+
+    border:
+        1px dashed
+        rgba(0,200,255,.20);
+}
+
+.ring::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 22%;
+
+    border-radius: 50%;
+
+    border:
+        1px dotted
+        rgba(255,0,200,.25);
+
+    animation:
+        ringRotate 8s linear infinite reverse;
+}
+
+@keyframes ringRotate {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   CREDITS
+========================================================= */
+
+.credits {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 20;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0),
+            rgba(0,0,0,.12)
+        );
+}
+
+.credits.active {
+
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/*
+   Основной контейнер титров.
+
+   Большой padding сверху позволяет
+   начать движение снизу экрана.
+*/
+
+.credits-content {
+
+    width:
+        min(850px, 82vw);
+
+    margin:
+        0 auto;
+
+    padding-top:
+        115vh;
+
+    padding-bottom:
+        110vh;
+
+    text-align:
+        center;
+
+    transform:
+        translate3d(0,0,0);
+
+    will-change:
+        transform;
+}
+
+
+/*
+   ========================================================
+   ROLL
+   ========================================================
+
+   LINEAR = абсолютно постоянная скорость.
+
+   Никаких:
+   ease
+   ease-in
+   ease-out
+   cubic-bezier
+
+   Поэтому титры не тормозят в середине.
+*/
+
+.credits.active .credits-content {
+
+    animation:
+        creditsRoll 48s linear forwards;
+}
+
+
+@keyframes creditsRoll {
+
+    from {
+        transform:
+            translate3d(0,0,0);
+    }
+
+    to {
+        transform:
+            translate3d(0,-330vh,0);
+    }
+}
+
+
+/* =========================================================
+   CREDIT INTRO
+========================================================= */
+
+.credit-intro {
+
+    margin-bottom:
+        100px;
+
+    font-size:
+        clamp(11px, 1.2vw, 15px);
+
+    letter-spacing:
+        .35em;
+
+    text-transform:
+        uppercase;
+
+    opacity:
+        .55;
+}
+
+
+/* =========================================================
+   CREDIT TITLES
+========================================================= */
+
+.credit-title {
+
+    margin:
+        100px 0 35px;
+
+    font-size:
+        clamp(28px, 5vw, 65px);
+
+    line-height:
+        1.2;
+
+    font-weight:
+        500;
+
+    /*
+       Small Caps
+    */
+
+    font-variant:
+        small-caps;
+
+    text-transform:
+        lowercase;
+
+    letter-spacing:
+        .14em;
+
+    text-shadow:
+        0 0 20px
+        rgba(255,255,255,.18);
+}
+
+
+/* =========================================================
+   CREDIT TEXT
+========================================================= */
+
+.credit-text {
+
+    font-size:
+        clamp(13px, 1.45vw, 18px);
+
+    line-height:
+        2;
+
+    font-weight:
+        300;
+
+    /*
+       Small Caps
+    */
+
+    font-variant:
+        small-caps;
+
+    text-transform:
+        lowercase;
+
+    letter-spacing:
+        .075em;
+
+    color:
+        rgba(255,255,255,.82);
+}
+
+
+/* =========================================================
+   SEPARATOR
+========================================================= */
+
+.separator {
+
+    width:
+        75px;
+
+    height:
+        1px;
+
+    margin:
+        65px auto;
+
+    background:
+        rgba(255,255,255,.45);
+
+    box-shadow:
+        0 0 15px
+        rgba(255,255,255,.3);
+}
+
+
+/* =========================================================
+   END INSIDE CREDITS
+========================================================= */
+
+.the-end {
+
+    margin-top:
+        170px;
+
+    padding-bottom:
+        50vh;
+
+    font-family:
+        "Great Vibes",
+        cursive;
+
+    font-size:
+        clamp(65px, 12vw, 150px);
+
+    opacity:
+        .95;
+
+    text-shadow:
+        0 0 10px white,
+        0 0 30px rgba(255,0,200,.7),
+        0 0 70px rgba(255,0,200,.35);
+}
+
+
+/* =========================================================
+   FINAL SCREEN
+========================================================= */
+
+.final {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        #020204;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity 2.5s ease,
+        visibility 2.5s ease;
+}
+
+
+.final.show {
+
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/* =========================================================
+   FINAL TEXT
+========================================================= */
+
+.final-text {
+
+    font-family:
+        "Great Vibes",
+        cursive;
+
+    font-size:
+        clamp(6rem, 17vw, 17rem);
+
+    opacity:
+        0;
+
+    transform:
+        scale(.8);
+
+    text-shadow:
+        0 0 10px white,
+        0 0 35px rgba(255,0,200,.8),
+        0 0 80px rgba(0,180,255,.4);
+
+    transition:
+        transform 2.2s cubic-bezier(.16,1,.3,1),
+        opacity 2s ease;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+
+.final.show .final-text {
+
+    opacity:
+        1;
+
+    transform:
+        scale(1);
+}
+
+
+/* =========================================================
+   FADE
+========================================================= */
+
+.fade {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 35;
+
+    background:
+        #000;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity 2.5s ease;
+}
+
+
+.fade.show {
+
+    opacity:
+        .72;
+}
+
+
+/* =========================================================
+   VIGNETTE
+========================================================= */
+
+.vignette {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 40;
+
+    pointer-events: none;
+
+    box-shadow:
+        inset 0 0 170px 60px
+        rgba(0,0,0,.88);
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            .01ms !important;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =======================================================
+     BACKGROUND
+======================================================= -->
+
+<div class="background">
+
+    <div class="gloss"></div>
+
+</div>
+
+
+<!-- =======================================================
+     CANVAS
+======================================================= -->
+
+<canvas id="patterns"></canvas>
+
+<canvas id="particles"></canvas>
+
+
+<!-- =======================================================
+     TITLE
+======================================================= -->
+
+<div
+    class="title-container"
+    id="titleContainer"
+>
+
+    <div class="ring"></div>
+
+    <div
+        class="title"
+        id="title"
+    ></div>
+
+</div>
+
+
+<!-- =======================================================
+     CREDITS
+======================================================= -->
+
+<div
+    class="credits"
+    id="credits"
+>
+
+    <div
+        class="credits-content"
+        id="creditsContent"
+    >
+
+
+        <div class="credit-intro">
+            однажды это должно было закончиться иначе
+        </div>
+
+
+        <!-- =================================================
+             СВЕТА
+        ================================================== -->
+
+        <div class="credit-title">
+            Света
+        </div>
+
+        <div class="credit-text">
+
+            Света была уверена,
+            что умеет придумывать планы,
+            которые невозможно раскрыть.
+
+            <br><br>
+
+            Особенно ей нравился один план:
+            выдать себя за свою подругу
+            и устроить ей небольшой публичный позор.
+
+            <br><br>
+
+            В голове Светы это выглядело гениально.
+
+            <br><br>
+
+            Почти как ограбление века.
+            Только без ограбления
+            и без века.
+
+        </div>
+
+
+        <div class="separator"></div>
+
+
+        <!-- =================================================
+             ПОДРУГА
+        ================================================== -->
+
+        <div class="credit-title">
+            Подруга
+        </div>
+
+        <div class="credit-text">
+
+            Подруга в этот момент
+            просто жила свою жизнь
+            и совершенно не подозревала,
+            что стала главным персонажем
+            чужого очень сомнительного сценария.
+
+            <br><br>
+
+            Всё шло по плану.
+
+            <br><br>
+
+            То есть по плану Светы.
+
+            <br><br>
+
+            А это,
+            как выяснилось,
+            были две совершенно разные вещи.
+
+        </div>
+
+
+        <div class="separator"></div>
+
+
+        <!-- =================================================
+             ВЕЛИКИЙ ПЛАН
+        ================================================== -->
+
+        <div class="credit-title">
+            Великий план
+        </div>
+
+        <div class="credit-text">
+
+            Света появилась,
+            уверенная в себе настолько,
+            будто заранее получила премию
+            за лучшую роль второго плана.
+
+            <br><br>
+
+            Она говорила,
+            изображала,
+            импровизировала
+            и с каждой секундой
+            всё сильнее верила
+            в собственную легенду.
+
+            <br><br>
+
+            Была только одна проблема.
+
+            <br><br>
+
+            Никто больше
+            в эту легенду не верил.
+
+        </div>
+
+
+        <div class="separator"></div>
+
+
+        <!-- =================================================
+             ПОВОРОТ
+        ================================================== -->
+
+        <div class="credit-title">
+            Поворот сюжета
+        </div>
+
+        <div class="credit-text">
+
+            В какой-то момент
+            люди начали понимать,
+            кто перед ними на самом деле.
+
+            <br><br>
+
+            Потом понял один человек.
+
+            <br><br>
+
+            Потом второй.
+
+            <br><br>
+
+            Потом, кажется,
+            поняли вообще все.
+
+            <br><br>
+
+            Света продолжала держаться уверенно.
+
+            <br><br>
+
+            Потому что признать провал
+            было уже поздно.
+
+            <br><br>
+
+            Да и красиво уйти со сцены
+            тоже не получилось.
+
+        </div>
+
+
+        <div class="separator"></div>
+
+
+        <!-- =================================================
+             ФИНАЛ
+        ================================================== -->
+
+        <div class="credit-title">
+            Финал
+        </div>
+
+        <div class="credit-text">
+
+            Ирония заключалась в том,
+            что Света хотела сделать посмешищем
+            свою подругу.
+
+            <br><br>
+
+            Но жизнь,
+            как обычно,
+            решила немного
+            отредактировать сценарий.
+
+            <br><br>
+
+            В результате
+            главным посмешищем вечера
+            совершенно неожиданно
+            стала сама Света.
+
+            <br><br>
+
+            Подруга не пострадала.
+
+            <br>
+
+            Репутация Светы —
+            немного.
+
+            <br>
+
+            А история —
+            осталась.
+
+        </div>
+
+
+        <div class="separator"></div>
+
+
+        <!-- =================================================
+             МОРАЛЬ
+        ================================================== -->
+
+        <div class="credit-title">
+            Мораль
+        </div>
+
+        <div class="credit-text">
+
+            Если очень хочется
+            выдать себя за другого человека,
+            сначала стоит убедиться,
+            что никто не знает,
+            как выглядит настоящий.
+
+            <br><br>
+
+            А ещё лучше —
+            просто не устраивать людям цирк.
+
+            <br><br>
+
+            Потому что иногда
+            билет в первый ряд
+            достаётся именно тому,
+            кто этот цирк
+            и организовал.
+
+        </div>
+
+
+        <!-- =================================================
+             ПОСЛЕДНИЙ ТЕКСТ ТИТРОВ
+        ================================================== -->
+
+        <div class="the-end">
+            конец
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     FADE
+======================================================= -->
+
+<div
+    class="fade"
+    id="fade"
+></div>
+
+
+<!-- =======================================================
+     FINAL
+======================================================= -->
+
+<div
+    class="final"
+    id="final"
+>
+
+    <div class="final-text">
+        КОНЕЦ!
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     VIGNETTE
+======================================================= -->
+
+<div class="vignette"></div>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const title =
+    document.getElementById("title");
+
+const titleContainer =
+    document.getElementById(
+        "titleContainer"
+    );
+
+const credits =
+    document.getElementById(
+        "credits"
+    );
+
+const creditsContent =
+    document.getElementById(
+        "creditsContent"
+    );
+
+const fade =
+    document.getElementById(
+        "fade"
+    );
+
+const finalScreen =
+    document.getElementById(
+        "final"
+    );
+
+
+/* =========================================================
+   CREATE LETTERS
+========================================================= */
+
+const text =
+    "Света хабалка 2006";
+
+
+for (const char of text) {
+
+    const letter =
+        document.createElement("span");
+
+
+    letter.className =
+        "letter";
+
+
+    /*
+       Пробел сохраняем,
+       чтобы слова не слипались.
+    */
+
+    letter.textContent =
+        char === " "
+            ? "\u00A0"
+            : char;
+
+
+    /*
+       Случайное направление
+       прилёта.
+    */
+
+    const angle =
+        Math.random() *
+        Math.PI * 2;
+
+
+    /*
+       Расстояние от центра.
+    */
+
+    const distance =
+        450 +
+        Math.random() * 650;
+
+
+    const x =
+        Math.cos(angle) *
+        distance;
+
+
+    const y =
+        Math.sin(angle) *
+        distance;
+
+
+    /*
+       Случайный поворот.
+    */
+
+    const rotation =
+        -120 +
+        Math.random() * 240;
+
+
+    /*
+       Случайный масштаб.
+    */
+
+    const scale =
+        .35 +
+        Math.random() * 1.15;
+
+
+    /*
+       Разные задержки.
+    */
+
+    const delay =
+        Math.random() * .9;
+
+
+    letter.style.setProperty(
+        "--x",
+        `${x}px`
+    );
+
+    letter.style.setProperty(
+        "--y",
+        `${y}px`
+    );
+
+    letter.style.setProperty(
+        "--r",
+        `${rotation}deg`
+    );
+
+    letter.style.setProperty(
+        "--s",
+        scale
+    );
+
+    letter.style.setProperty(
+        "--delay",
+        `${delay}s`
+    );
+
+
+    title.appendChild(
+        letter
+    );
+}
+
+
+/* =========================================================
+   START ANIMATION
+========================================================= */
+
+requestAnimationFrame(() => {
+
+    requestAnimationFrame(() => {
+
+
+        /*
+           Буквы начинают
+           собираться.
+        */
+
+        title.classList.add(
+            "assembled"
+        );
+
+
+        /*
+           После сборки ждём
+           ещё 5 секунд.
+        */
+
+        setTimeout(() => {
+
+
+            /*
+               Название начинает
+               уходить вверх.
+            */
+
+            titleContainer.classList.add(
+                "leaving"
+            );
+
+
+            /*
+               Затемнение.
+            */
+
+            fade.classList.add(
+                "show"
+            );
+
+
+            /*
+               Через 0.9 сек
+               запускаем титры.
+            */
+
+            setTimeout(() => {
+
+                credits.classList.add(
+                    "active"
+                );
+
+
+                /*
+                   =================================================
+                   КРИТИЧЕСКИЙ МОМЕНТ
+                   =================================================
+
+                   Никакого setTimeout на 48 секунд.
+
+                   Мы ждём реальное завершение
+                   CSS-анимации.
+
+                   Поэтому КОНЕЦ никогда не появится
+                   раньше титров.
+                */
+
+                creditsContent.addEventListener(
+                    "animationend",
+                    onCreditsFinished,
+                    {
+                        once: true
+                    }
+                );
+
+            }, 900);
+
+        }, 8000);
+
+    });
+
+});
+
+
+/* =========================================================
+   CREDITS FINISHED
+========================================================= */
+
+function onCreditsFinished(event) {
+
+
+    /*
+       На всякий случай проверяем
+       название анимации.
+    */
+
+    if (
+        event.animationName !==
+        "creditsRoll"
+    ) {
+        return;
+    }
+
+
+    /*
+       ======================================================
+       В ЭТОТ МОМЕНТ ТИТРЫ УЖЕ ЗАКОНЧИЛИ ДВИЖЕНИЕ.
+       ======================================================
+    */
+
+
+    /*
+       Полностью скрываем титры.
+    */
+
+    credits.classList.remove(
+        "active"
+    );
+
+
+    /*
+       Убираем затемнение.
+    */
+
+    fade.classList.remove(
+        "show"
+    );
+
+
+    /*
+       Даём короткий чёрный кадр.
+    */
+
+    setTimeout(() => {
+
+
+        /*
+           И ТОЛЬКО ТЕПЕРЬ
+           появляется КОНЕЦ!
+        */
+
+        finalScreen.classList.add(
+            "show"
+        );
+
+    }, 900);
+}
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const patternCanvas =
+    document.getElementById(
+        "patterns"
+    );
+
+const particleCanvas =
+    document.getElementById(
+        "particles"
+    );
+
+
+const pctx =
+    patternCanvas.getContext(
+        "2d"
+    );
+
+const ctx =
+    particleCanvas.getContext(
+        "2d"
+    );
+
+
+let W = 0;
+let H = 0;
+
+let time = 0;
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+function resize() {
+
+    W =
+        patternCanvas.width =
+        particleCanvas.width =
+        window.innerWidth;
+
+
+    H =
+        patternCanvas.height =
+        particleCanvas.height =
+        window.innerHeight;
+}
+
+
+resize();
+
+
+window.addEventListener(
+    "resize",
+    resize,
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================================
+   BACKGROUND PATTERNS
+========================================================= */
+
+function drawPatterns() {
+
+
+    pctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    const cx =
+        W / 2;
+
+    const cy =
+        H / 2;
+
+
+    /*
+       Плавные волны.
+
+       Всего 6 линий —
+       намного легче для браузера.
+    */
+
+    for (
+        let i = 0;
+        i < 6;
+        i++
+    ) {
+
+
+        pctx.beginPath();
+
+
+        for (
+            let x = 0;
+            x <= W;
+            x += 14
+        ) {
+
+
+            const y =
+                cy +
+
+                Math.sin(
+                    x * .006 +
+                    time * .45 +
+                    i * .7
+                ) *
+
+                (70 + i * 15) +
+
+                (i - 3) * 45;
+
+
+            if (x === 0) {
+
+                pctx.moveTo(
+                    x,
+                    y
+                );
+
+            } else {
+
+                pctx.lineTo(
+                    x,
+                    y
+                );
+            }
+        }
+
+
+        pctx.strokeStyle =
+            `hsla(
+                ${270 + i * 15},
+                100%,
+                65%,
+                .065
+            )`;
+
+
+        pctx.lineWidth =
+            1;
+
+
+        pctx.stroke();
+    }
+
+
+    /*
+       Большие эллипсы.
+    */
+
+    pctx.save();
+
+
+    pctx.translate(
+        cx,
+        cy
+    );
+
+
+    pctx.rotate(
+        time * .018
+    );
+
+
+    for (
+        let i = 0;
+        i < 8;
+        i++
+    ) {
+
+
+        pctx.beginPath();
+
+
+        pctx.ellipse(
+            0,
+            0,
+
+            150 + i * 90,
+            70 + i * 50,
+
+            i * .3,
+
+            0,
+            Math.PI * 2
+        );
+
+
+        pctx.strokeStyle =
+            "rgba(170,70,255,.045)";
+
+
+        pctx.stroke();
+    }
+
+
+    pctx.restore();
+
+
+    time += .008;
+
+
+    requestAnimationFrame(
+        drawPatterns
+    );
+}
+
+
+drawPatterns();
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+
+/*
+   Только 70 частиц.
+
+   В старой версии было много
+   сравнений каждой частицы
+   с каждой — это было дорого.
+*/
+
+const particles = [];
+
+const PARTICLE_COUNT =
+    70;
+
+
+for (
+    let i = 0;
+    i < PARTICLE_COUNT;
+    i++
+) {
+
+
+    particles.push({
+
+        x:
+            Math.random() * W,
+
+        y:
+            Math.random() * H,
+
+        vx:
+            (Math.random() - .5)
+            * .18,
+
+        vy:
+            (Math.random() - .5)
+            * .18,
+
+        size:
+            .5 +
+            Math.random() * 1.5,
+
+        phase:
+            Math.random() *
+            Math.PI * 2,
+
+        alpha:
+            .2 +
+            Math.random() * .35
+    });
+}
+
+
+/* =========================================================
+   DRAW PARTICLES
+========================================================= */
+
+function drawParticles() {
+
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    for (
+        const p of particles
+    ) {
+
+
+        p.x +=
+            p.vx;
+
+        p.y +=
+            p.vy;
+
+
+        p.phase +=
+            .012;
+
+
+        /*
+           Плавное мерцание.
+        */
+
+        const alpha =
+            p.alpha +
+            Math.sin(
+                p.phase
+            ) * .12;
+
+
+        /*
+           Телепорт через границу.
+        */
+
+        if (
+            p.x < -5
+        ) {
+            p.x = W + 5;
+        }
+
+        if (
+            p.x > W + 5
+        ) {
+            p.x = -5;
+        }
+
+        if (
+            p.y < -5
+        ) {
+            p.y = H + 5;
+        }
+
+        if (
+            p.y > H + 5
+        ) {
+            p.y = -5;
+        }
+
+
+        /*
+           Рисуем точку.
+        */
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                255,
+                255,
+                ${alpha}
+            )`;
+
+
+        ctx.fill();
+    }
+
+
+    requestAnimationFrame(
+        drawParticles
+    );
+}
+
+
+drawParticles();
+
+
+/* =========================================================
+   CLICK EFFECT
+========================================================= */
+
+window.addEventListener(
+    "click",
+    event => {
+
+
+        /*
+           Небольшой burst.
+
+           Мы не добавляем новые объекты,
+           а используем существующие частицы,
+           поэтому память не растёт.
+        */
+
+        for (
+            let i = 0;
+            i < 12;
+            i++
+        ) {
+
+
+            const p =
+                particles[
+                    Math.floor(
+                        Math.random() *
+                        particles.length
+                    )
+                ];
+
+
+            p.x =
+                event.clientX;
+
+            p.y =
+                event.clientY;
+
+
+            p.vx =
+                (Math.random() - .5)
+                * .8;
+
+            p.vy =
+                (Math.random() - .5)
+                * .8;
+        }
+    },
+    {
+        passive: true
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
