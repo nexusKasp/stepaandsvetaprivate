@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -441,11 +440,36 @@ canvas {
     transform:
         translate3d(-50%, 0, 0);
 
+    /*
+       ВАЖНО: раньше здесь были 115vh / 80vh.
+
+       На мобильных браузерах (особенно с
+       автоскрывающейся адресной строкой)
+       "vh" пересчитывается ПОСЛЕ первого
+       рендера и может быть сильно занижен
+       на старте. Из-за overflow:hidden
+       страница никогда не скроллится,
+       поэтому браузер иногда даже не
+       успевает выдать корректное значение.
+
+       Из-за этого блок титров на телефоне
+       мог оказаться в разы короче, чем
+       должен быть — и JS-логика окончания
+       титров (проверка bottom <= 0)
+       срабатывала почти мгновенно.
+
+       Поэтому теперь используем
+       собственную CSS-переменную --vh,
+       которую выставляет JS через
+       window.innerHeight (это надёжное,
+       не "плавающее" значение).
+    */
+
     padding-top:
-        115vh;
+        calc(var(--vh, 1vh) * 115);
 
     padding-bottom:
-        80vh;
+        calc(var(--vh, 1vh) * 80);
 
     text-align:
         center;
@@ -801,6 +825,17 @@ canvas {
                 8vw,
                 42px
             );
+
+        /*
+           Тяжёлые тени на слабом GPU
+           телефона дают лишнюю нагрузку
+           каждый кадр — на мобильных
+           делаем тень легче.
+        */
+
+        text-shadow:
+            0 0 8px
+            rgba(255,255,255,.12);
     }
 
     .credit-text {
@@ -820,6 +855,28 @@ canvas {
 
         margin:
             48px auto;
+    }
+
+    .the-end {
+
+        text-shadow:
+            0 0 6px white,
+            0 0 16px rgba(255,0,200,.5);
+    }
+
+    .final-text {
+
+        text-shadow:
+            0 0 6px white,
+            0 0 18px rgba(255,0,200,.55),
+            0 0 36px rgba(0,180,255,.2);
+    }
+
+    .vignette {
+
+        box-shadow:
+            inset 0 0 90px 25px
+            rgba(0,0,0,.78);
     }
 }
 
@@ -1218,6 +1275,59 @@ canvas {
 <script>
 
 /* =========================================================
+   VIEWPORT HEIGHT FIX (mobile)
+========================================================= */
+
+/*
+   На мобильных браузерах "vh" ненадёжен:
+   значение пересчитывается при появлении
+   / скрытии адресной строки, а иногда
+   и просто неверно на первом рендере,
+   особенно если страница никогда не
+   скроллится (у нас overflow:hidden).
+
+   Поэтому вместо CSS vh используем свою
+   переменную --vh = 1% от реальной
+   window.innerHeight, выставленную из JS.
+*/
+
+function setViewportUnit() {
+
+    const vh =
+        window.innerHeight * 0.01;
+
+    document.documentElement.style.setProperty(
+        "--vh",
+        `${vh}px`
+    );
+}
+
+setViewportUnit();
+
+window.addEventListener(
+    "resize",
+    setViewportUnit,
+    { passive: true }
+);
+
+/*
+   На iOS Safari адресная строка может
+   скрыться/появиться уже ПОСЛЕ загрузки,
+   без события resize сразу. Подстрахуемся
+   небольшим повторным вызовом.
+*/
+
+window.addEventListener(
+    "orientationchange",
+    () => setTimeout(setViewportUnit, 300),
+    { passive: true }
+);
+
+setTimeout(setViewportUnit, 300);
+setTimeout(setViewportUnit, 1000);
+
+
+/* =========================================================
    ELEMENTS
 ========================================================= */
 
@@ -1400,7 +1510,17 @@ requestAnimationFrame(() => {
 
             /*
                Запускаем титры.
+
+               Дополнительно ещё раз
+               пересчитываем --vh прямо
+               перед стартом — на случай,
+               если адресная строка
+               телефона успела скрыться
+               за эти 8 секунд.
             */
+
+            setViewportUnit();
+
 
             setTimeout(
                 startCredits,
@@ -1432,8 +1552,25 @@ requestAnimationFrame(() => {
    - одинаково работает Safari/Chrome/Firefox;
    - КОНЕЦ появляется только после реального
      окончания движения.
-*/
 
+   ВАЖНО: раньше окончание титров
+   определялось через
+   creditsContent.getBoundingClientRect()
+   на КАЖДОМ кадре. Из-за плавающего vh
+   на мобильных высота блока могла быть
+   занижена уже на старте — и rect.bottom
+   уходил в минус почти сразу, титры
+   "проматывались" мгновенно.
+
+   Теперь дистанция считается ОДИН РАЗ
+   в начале (offsetHeight – надёжное
+   пиксельное значение, не зависящее
+   от vh-багов) и дальше просто
+   сравнивается пройденный путь creditsY
+   с этой дистанцией. Так поведение
+   предсказуемо и одинаково на всех
+   устройствах.
+*/
 
 let creditsRunning =
     false;
@@ -1442,6 +1579,9 @@ let creditsY =
     0;
 
 let creditsLastTime =
+    0;
+
+let creditsTotalDistance =
     0;
 
 
@@ -1472,9 +1612,6 @@ function startCredits() {
 
     /*
        Начальная позиция.
-
-       Сам блок уже имеет padding-top: 115vh,
-       поэтому начинаем с нуля.
     */
 
     creditsY = 0;
@@ -1482,6 +1619,27 @@ function startCredits() {
 
     creditsContent.style.transform =
         "translate3d(-50%, 0px, 0px)";
+
+
+    /*
+       Считаем полную дистанцию один раз:
+       высота всего блока (с его
+       padding-top/padding-bottom) плюс
+       высота экрана — чтобы блок точно
+       полностью ушёл за верхнюю границу.
+
+       offsetHeight — это реальный
+       посчитанный пиксельный размер
+       на момент старта, он уже включает
+       padding, посчитанный из
+       --vh переменной, которую мы
+       обновили непосредственно перед
+       стартом.
+    */
+
+    creditsTotalDistance =
+        creditsContent.offsetHeight +
+        window.innerHeight;
 
 
     creditsRunning =
@@ -1556,17 +1714,15 @@ function updateCredits(now) {
        ПРОВЕРКА ОКОНЧАНИЯ
        =====================================================
 
-       Когда нижняя граница блока
-       полностью ушла за верхнюю
-       границу экрана — титры закончены.
+       Сравниваем пройденный путь
+       с посчитанной один раз дистанцией.
+       Это надёжно и не зависит от
+       "плавающего" vh или пересчёта
+       layout на слабых мобильных.
     */
 
-    const rect =
-        creditsContent.getBoundingClientRect();
-
-
     if (
-        rect.bottom <= 0
+        creditsY >= creditsTotalDistance
     ) {
 
         finishCredits();
@@ -1767,7 +1923,7 @@ window.addEventListener(
 
 const patternCount =
     isMobile
-        ? 3
+        ? 2
         : 5;
 
 
@@ -1822,7 +1978,7 @@ function drawPatterns() {
 
             const step =
                 isMobile
-                    ? 30
+                    ? 34
                     : 20;
 
 
@@ -1906,7 +2062,7 @@ drawPatterns();
 
 const particleCount =
     isMobile
-        ? 25
+        ? 14
         : 50;
 
 
@@ -2144,4 +2300,3 @@ window.addEventListener(
 
 </body>
 </html>
-```
